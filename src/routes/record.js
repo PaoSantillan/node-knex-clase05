@@ -90,6 +90,15 @@ router.route('/records/insert')
         res.send({success: true});
 });
 
+//Table tags
+router.route('/tags/insert')
+    .post(async (req, res) => {
+        await knex('tags')
+            .insert(req.body)
+
+        res.send({success: true});
+});
+
 //Update record
 /*UPDATE records SET archivo = "new_name_picture.jpg" WHERE id = 1*/
 router.route('/records/update/:id')
@@ -108,6 +117,8 @@ router.route('/tags/update/all')
         await knex('tags')
             .update(req.body)
 
+        //Esta es otra forma de hacerlo, pueden probarla si quieren
+        //Aqui aclaran el campo que quieren actualizar, si mandan el req.body lo interpreta solo
         /*const new_tags = await knex('tags')
         .update({
             title: 'new_name_tag2.jpg'
