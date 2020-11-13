@@ -7,9 +7,9 @@ const knex = require('../db')
 /**SELECT * FROM records */
 router.route('/records')
     .get(async (req, res) => {
-        const records = await knex
+        const records = await knex('records')
+            .whereNull('deleted_at')
             .select()
-            .from('records')
             
         res.json({records});
 });
@@ -75,6 +75,60 @@ router.route('/records/joinWithType')
             .select("records.id AS id_record", "records.archivo", "type_records.id AS id_type_record", "type_records.nombre AS type_record")
 
         res.json({records});
+});
+
+
+//Create record
+/*INSERT INTO `records`(`id`, `archivo`, `type_record_id`, `created_at`, `updated_at`, `deleted_at`) 
+                VALUES (NULL,'foto_desde_node3.jpg',1,NULL,NULL,NULL)
+*/
+router.route('/records/insert')
+    .post(async (req, res) => {
+        await knex('records')
+            .insert(req.body)
+
+        res.send({success: true});
+});
+
+//Update record
+/*UPDATE records SET archivo = "new_name_picture.jpg" WHERE id = 1*/
+router.route('/records/update/:id')
+    .patch(async (req, res) => {
+        await knex('records')
+            .where('id', '=', req.params.id)
+            .update(req.body)
+
+        res.send({success: true});
+});
+
+//Update tags 
+/*UPDATE tags SET title = "new_name_tag.jpg"*/
+router.route('/tags/update/all')
+    .patch(async (req, res) => {
+        await knex('tags')
+            .update(req.body)
+
+        /*const new_tags = await knex('tags')
+        .update({
+            title: 'new_name_tag2.jpg'
+        })*/
+
+        res.send({success: true});
+});
+
+//Delete record (soft)
+/*UPDATE records SET deleted_at = (fecha actual) WHERE id = 1 */
+router.route('/records/delete/:id')
+    .delete(async (req, res) => {
+        await knex('records')
+            .where({
+                id: req.params.id
+            })
+            .update({
+                deleted_at: new Date()
+            })
+
+        res.send({success: true});
 });
 
 module.exports = router;
